@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <set>
+#include <queue>
 #include <algorithm>
 #include <fstream>
 #define maxi 50001
@@ -13,7 +13,7 @@ ofstream fout("bellmanford.out");
 
 vector< pair<int,int> > L[maxi];
 int n, m , x, y ,c;
-set<int> tail;
+queue<int> tail;
 int dist[maxi];
 int visited[maxi];
 
@@ -32,13 +32,13 @@ int main()
         visited[i] = 0;
     }
 
-    tail.insert(1);
+    tail.push(1);
     dist[1] = 0;
 
     while( !tail.empty() )
     {
-        int node = *tail.begin();
-        tail.erase( tail.begin() );
+        int node = tail.front();
+        tail.pop();
 
         visited[node]++;
         if( visited[node] == n )
@@ -55,7 +55,7 @@ int main()
             if( dist[vecin] > dist[node] + cost )
             {
                 dist[vecin] = dist[node] + cost;
-                tail.insert(vecin);
+                tail.push(vecin);
             }
         }
     }
