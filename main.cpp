@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <tuple>
+#include <set>
 #include <algorithm>
 #include <fstream>
 #define maxi 50001
@@ -11,10 +11,11 @@ using namespace std;
 ifstream fin("bellmanford.in");
 ofstream fout("bellmanford.out");
 
-vector< tuple<int,int,int> > L;
-int dist[maxi];
+vector< pair<int,int> > L[maxi];
 int n, m , x, y ,c;
-
+set<int> tail;
+int dist[maxi];
+int visited[maxi];
 
 int main()
 {
@@ -22,34 +23,43 @@ int main()
     for( int i = 1 ; i <= m ; i++ )
     {
         fin >> x >> y >> c;
-        L.push_back( make_tuple(x, y , c) );
+        L[x].push_back( make_pair(y , c) );
     }
 
     for( int i = 1 ; i <= n ; i++ )
-            dist[i] = infinite;
-
-    dist[1] = 0;
-
-    for( int i = 1 ; i < n ; i++ )
     {
-        for( auto it : L )
-        {
-            int src , dest, cost;
-            tie(src, dest, cost) = it;
-            dist[dest] = min( dist[dest] , dist[src] + cost );
-        }
+        dist[i] = infinite;
+        visited[i] = 0;
     }
 
-    for( auto it : L )
+    tail.insert(1);
+    dist[1] = 0;
+
+    while( !tail.empty() )
     {
-        int src , dest, cost;
-        tie(src, dest, cost) = it;
-        if( dist[dest] > dist[src] + cost )
+        int node = *tail.begin();
+        tail.erase( tail.begin() );
+
+        visited[node]++;
+        if( visited[node] == n )
         {
             fout << "Ciclu negativ!";
             return 0;
         }
+
+        for( auto it = L[node].begin() ; it != L[node].end() ; it++ )
+        {
+            int vecin = it -> first;
+            int cost = it -> second;
+
+            if( dist[vecin] > dist[node] + cost )
+            {
+                dist[vecin] = dist[node] + cost;
+                tail.insert(vecin);
+            }
+        }
     }
+
 
     for( int i = 2 ; i <= n ; i++ )
         fout << dist[i] << " ";
